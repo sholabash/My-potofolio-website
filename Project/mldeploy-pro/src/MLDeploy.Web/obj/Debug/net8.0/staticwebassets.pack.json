@@ -1,0 +1,37 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\Users\\sholabash\\Desktop\\My potofolio website\\Project\\mldeploy-pro\\src\\MLDeploy.Web\\bin\\Debug\\net8.0\\wwwroot\\_framework\\blazor.webassembly.js",
+      "PackagePath": "staticwebassets\\_framework\\blazor.webassembly.js"
+    },
+    {
+      "Id": "C:\\Users\\sholabash\\Desktop\\My potofolio website\\Project\\mldeploy-pro\\src\\MLDeploy.Web\\obj\\Debug\\net8.0\\compressed\\4irb4eheoj.gz",
+      "PackagePath": "staticwebassets\\_framework\\blazor.webassembly.js.gz"
+    },
+    {
+      "Id": "C:\\Users\\sholabash\\Desktop\\My potofolio website\\Project\\mldeploy-pro\\src\\MLDeploy.Web\\wwwroot\\css\\index.html",
+      "PackagePath": "staticwebassets\\css\\index.html"
+    },
+    {
+      "Id": "C:\\Users\\sholabash\\Desktop\\My potofolio website\\Project\\mldeploy-pro\\src\\MLDeploy.Web\\wwwroot\\index.html",
+      "PackagePath": "staticwebassets\\index.html"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.MLDeploy.Web.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.MLDeploy.Web.props",
+      "PackagePath": "build\\MLDeploy.Web.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.MLDeploy.Web.props",
+      "PackagePath": "buildMultiTargeting\\MLDeploy.Web.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildTransitive.MLDeploy.Web.props",
+      "PackagePath": "buildTransitive\\MLDeploy.Web.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "pKwu4WrXB21xCkfzM1trmn4L83DSzdkUDWbBD/NeyqM=",
+  "Source": "MLDeploy.API",
+  "BasePath": "_content/MLDeploy.API",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

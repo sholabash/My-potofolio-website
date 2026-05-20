@@ -1,0 +1,164 @@
+@page "/models"
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<PageTitle>Models - MLDeploy Pro</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">ML Models</MudText>
+
+<MudButton Variant="Variant.Filled" Color="Color.Primary" 
+    StartIcon="@Icons.Material.Filled.Add" 
+    OnClick="OpenCreateDialog"
+    Class="mb-4">
+    Register New Model
+</MudButton>
+
+@if (_models == null)
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    <MudTable Items="_models" Dense="true" Hover="true" Bordered="true" Striped="true">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Registered Models</MudText>
+            <MudSpacer />
+            <MudTextField @bind-Value="_searchString" Placeholder="Search models..." 
+                Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" 
+                IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Name</MudTh>
+            <MudTh>Framework</MudTh>
+            <MudTh>Status</MudTh>
+            <MudTh>Created</MudTh>
+            <MudTh>Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Name">
+                <MudText Typo="Typo.body1" Style="font-weight: 500;">@context.Name</MudText>
+                @if (!string.IsNullOrEmpty(context.Description))
+                {
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">@context.Description</MudText>
+                }
+            </MudTd>
+            <MudTd DataLabel="Framework">
+                <MudChip Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined">@context.Framework</MudChip>
+            </MudTd>
+            <MudTd DataLabel="Status">
+                <MudChip Size="Size.Small" Color="GetStatusColor(context.Status)">@context.Status</MudChip>
+            </MudTd>
+            <MudTd DataLabel="Created">@context.CreatedAt.ToString("MMM dd, yyyy")</MudTd>
+            <MudTd DataLabel="Actions">
+                <MudIconButton Icon="@Icons.Material.Filled.RocketLaunch" Size="Size.Small" 
+                    Color="Color.Primary" OnClick="() => DeployModel(context.Id)" />
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" 
+                    Color="Color.Error" OnClick="() => DeleteModel(context.Id)" />
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+}
+
+<MudDialog @bind-IsVisible="_showCreateDialog" MaxWidth="MaxWidth.Small">
+    <DialogContent>
+        <MudTextField @bind-Value="_newModel.Name" Label="Model Name" Required="true" />
+        <MudTextField @bind-Value="_newModel.Description" Label="Description" Lines="3" />
+        <MudSelect @bind-Value="_newModel.Framework" Label="Framework" Required="true">
+            <MudSelectItem Value="@("sklearn")">Scikit-Learn</MudSelectItem>
+            <MudSelectItem Value="@("tensorflow")">TensorFlow</MudSelectItem>
+            <MudSelectItem Value="@("pytorch")">PyTorch</MudSelectItem>
+            <MudSelectItem Value="@("xgboost")">XGBoost</MudSelectItem>
+        </MudSelect>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="() => _showCreateDialog = false">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="CreateModel">Create</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private List<MLModel>? _models;
+    private string _searchString = "";
+    private bool _showCreateDialog = false;
+    private CreateModelRequest _newModel = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadModels();
+    }
+
+    private async Task LoadModels()
+    {
+        try
+        {
+            _models = await Http.GetFromJsonAsync<List<MLModel>>("api/models");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+    }
+
+    private void OpenCreateDialog()
+    {
+        _newModel = new CreateModelRequest();
+        _showCreateDialog = true;
+    }
+
+    private async Task CreateModel()
+    {
+        try
+        {
+            var response = await Http.PostAsJsonAsync("api/models", _newModel);
+            if (response.IsSuccessStatusCode)
+            {
+                _showCreateDialog = false;
+                await LoadModels();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error creating model: {ex.Message}");
+        }
+    }
+
+    private void DeployModel(Guid id) => Navigation.NavigateTo($"deployments?modelId={id}");
+    
+    private async Task DeleteModel(Guid id)
+    {
+        try
+        {
+            await Http.DeleteAsync($"api/models/{id}");
+            await LoadModels();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deleting: {ex.Message}");
+        }
+    }
+
+    private Color GetStatusColor(string status) => status switch
+    {
+        "Running" or "Ready" => Color.Success,
+        "Training" or "Pending" => Color.Warning,
+        "Failed" => Color.Error,
+        _ => Color.Default
+    };
+
+    public class MLModel
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = "";
+        public string? Description { get; set; }
+        public string Framework { get; set; } = "";
+        public string Status { get; set; } = "";
+        public DateTime CreatedAt { get; set; }
+    }
+
+    public class CreateModelRequest
+    {
+        public string Name { get; set; } = "";
+        public string? Description { get; set; }
+        public string Framework { get; set; } = "sklearn";
+    }
+}

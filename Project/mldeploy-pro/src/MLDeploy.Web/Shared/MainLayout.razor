@@ -1,0 +1,21 @@
+@inherits LayoutComponentBase
+
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudAppBar Elevation="1">
+    <MudText Typo="Typo.h6">MLDeploy Pro</MudText>
+    <MudSpacer />
+    <MudNavMenu>
+        <MudNavLink Href="/" Match="NavLinkMatch.All">Dashboard</MudNavLink>
+        <MudNavLink Href="/models" Match="NavLinkMatch.Prefix">Models</MudNavLink>
+        <MudNavLink Href="/deployments" Match="NavLinkMatch.Prefix">Deployments</MudNavLink>
+    </MudNavMenu>
+</MudAppBar>
+
+<MudMainContent>
+    <MudContainer MaxWidth="MaxWidth.Large" Class="my-16">
+        @Body
+    </MudContainer>
+</MudMainContent>

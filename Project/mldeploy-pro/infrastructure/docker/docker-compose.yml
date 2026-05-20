@@ -1,0 +1,80 @@
+version: "3.8"
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: mldeploy-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: mldeploy
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - mldeploy-network
+
+  # .NET API
+  api:
+    build:
+      context: ../../src/MLDeploy.API
+      dockerfile: Dockerfile
+    container_name: mldeploy-api
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: Host=postgres;Database=mldeploy;Username=postgres;Password=postgres
+      MLService__Url: http://ml-service:8000
+    ports:
+      - "5000:80"
+    networks:
+      - mldeploy-network
+
+  # Python ML Service
+  ml-service:
+    build:
+      context: ../../src/MLDeploy.ML
+      dockerfile: Dockerfile
+    container_name: mldeploy-ml-service
+    restart: always
+    environment:
+      MODEL_PATH: /app/models
+    ports:
+      - "8000:8000"
+    volumes:
+      - ml_models:/app/models
+    networks:
+      - mldeploy-network
+
+  # Blazor Web UI
+  web:
+    build:
+      context: ../../src/MLDeploy.Web
+      dockerfile: Dockerfile
+    container_name: mldeploy-web
+    restart: always
+    depends_on:
+      - api
+    ports:
+      - "5001:80"
+    networks:
+      - mldeploy-network
+
+volumes:
+  postgres_data:
+  ml_models:
+
+networks:
+  mldeploy-network:
+    driver: bridge
